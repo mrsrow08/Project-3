@@ -1,5 +1,5 @@
-<html>
-<!-- a comment -->
+<html class="loading">
+
 <head>
     <link href='http://fonts.googleapis.com/css?family=Codystar|Open+Sans' rel='stylesheet' type='text/css'>
     <link href='./beat.css' rel='stylesheet' type='text/css'>
@@ -10,11 +10,15 @@
         <!-- #info-container is the top panel, with album art and info -->
         <div id='info-container' class='container'>
             <div id='cover-container'>
-                <div id='cover'></div>
+                <div id="cover">
+                    <canvas id="canId"></canvas>
+                </div>
             </div>
             <div id='track-data-container'>
                 <div id='track-artist'></div>
+                <div id="separator">-</div>
                 <div id='track-name'></div>
+                <div id="lyrics"></div>
             </div>
         </div>
 
@@ -81,19 +85,19 @@
                             </a>
                         </div>
                     </div>
+                    <div class="cell duration">
+                        duration
 
-                    <div class='cell length'>
-                        length
-                        <!-- length ascending/Descending sort arrows -->
+                        <!-- Duration ascending/Descending sort arrows -->
                         <div class='sort-container'>
                             <a href='#' class='sort up'>
-                                <div id='sort-length-up' class='arrow up'></div>
+                                <div id='sort-duration-up' class='arrow up'></div>
                             </a>
                             <a href='#' class='sort down'>
-                                <div id='sort-length-down' class='arrow down'></div>
+                                <div id='sort-duration-down' class='arrow down'></div>
                             </a>
                         </div>
-                    </div>                    
+                    </div>
                 </div>
 
                 <!-- .overlay used as a placeholder for pseudo:before to apply box-shadow
@@ -109,6 +113,7 @@
     <script src='./processing.js'></script>
     <script src='./spotify.js'></script>
     <script src='./echonest.js'></script>
+    <script src='./musixmatch.js'></script>
     <script src='./beat.js'></script>
 </body>
 
