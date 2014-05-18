@@ -31,9 +31,6 @@ function SPIframe(track) {
 
     var iframe = document.createElement('iframe');
 
-
-          // embedContainer.appendChild(inter());//.style.backgroundImage = 'url('+coverURL(track) + ')');
-
     var attrs = SPIframeAttrs(track);
     for (var attr in attrs) {
         iframe.setAttribute(attr, attrs[attr]);
@@ -59,13 +56,8 @@ function SPIframe(track) {
     // This is what the 'inter' element (short for interstitial) does--it's a
     // transparent overlay we use to detect events.
     embedContainer.appendChild(iframe);
-	
-	
-	
-   // embedContainer.appendChild(inter());//.style.backgroundImage = 'url('+coverURL(track) + ')');
-	embedContainer.appendChild(inter());
-    //console.log(SPMetadata(track));
-	//ch.style.background.backgroundImage = 'url('+coverURL(track) + ')';
+    embedContainer.appendChild(inter());
+
     return embedContainer;
 }
 
@@ -124,7 +116,6 @@ function SPMetadata(track) {
     document.getElementsByTagName('html')[0].appendChild(script);
 
     return track.spotify || null;
-	
 }
 
 
@@ -195,6 +186,6 @@ function trackByHref(href) {
 function coverURL(track) {
     // (1) This function grabs the cover thumbnail URL that the Spotify API 
     // provides us with and modifies it to grab the hi-res, unbranded version
-	
+
     return track.spotify.thumbnail_url.replace('/cover/', '/640/');
 }

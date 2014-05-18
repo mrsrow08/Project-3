@@ -22,7 +22,7 @@ Using EchoNest's API, add another column of information on each track and modify
 
 ### (2) Visualize another EchoNest attribute
 
-Choose another piece of data from EchoNest's API to visualize using a Processing sketch, either for a currently playing song or for all the songs.  You may find the [Analyzer Documentation](http://developer.echonest.com/docs/v4/_static/AnalyzeDocumentation.pdf) useful in understanding the full range of under-documented API features.  Similarly, the [EchoNest lab](http://static.echonest.com/labs/) may be a good starting point for brainstorming extensions and/or seeing how they work.
+Choose another piece of data from EchoNest's API to visualize using a Processing sketch, either for a currently playing song or for all the songs.
 
 ![Visualize a new EchoNest attribute](https://raw.githubusercontent.com/DGMD-E-15/Project-3/master/README_media/NewVisualizationExtension.png)
 
@@ -47,19 +47,3 @@ You'll notice that this app sucks.  Which is to say, the user experience is very
 
 ---
 
-## Resources
-
-+ [Spotify's Play Button Embed Documentation](https://developer.spotify.com/technologies/widgets/spotify-play-button/)
-+ [Spotify's Web API Documentation](https://developer.spotify.com/technologies/web-api/)
-+ ["Deconstructing Spotify's built-in HTTP server"](http://cgbystrom.com/articles/deconstructing-spotifys-builtin-http-server/)
-+ [EchoNest's API Documentation](http://developer.echonest.com/docs/v4)
-+ [EchoNest's Analyzer Documentation](http://developer.echonest.com/docs/v4/_static/AnalyzeDocumentation.pdf)
-+ [JSON versus JSONP Tutorial - Live](http://json-jsonp-tutorial.craic.com/index.html)
-+ ["What's in an HTTP request?"](http://rve.org.uk/dumprequest) and ["HTTP Request/Response Basics"](http://devhub.fm/http-requestresponse-basics/) are good places to start to understand how we might use HTTP to interact with APIs.  For a lot more detail about what's going on behind the scenes, you can check out ["How Does the Internet Work?"](http://www.stanford.edu/class/msande91si/www-spr04/readings/week1/InternetWhitepaper.htm)
-+ ["Ways to circumvent the same-origin policy"](https://stackoverflow.com/questions/3076414/ways-to-circumvent-the-same-origin-policy) is a nice overview of some of the ways people handle the limits on cross-domain communication which we struggled with in this project.
-
---
-
-## Questions?
-
-Please either [file an issue on this repository](https://github.com/DGMD-E-15/Project-3/issues/new) if you have a question _which does not concern your code_, or please file an issue on your own repository if you'd like us to take a look at a problem you have.
