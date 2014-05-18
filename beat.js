@@ -15,16 +15,15 @@ var tracks = [];
 
 // (1) We're going to construct our search using Spotify's API, in our case
 // searching for Kanye West and limiting our results to 10 tracks
-var search = 'Kanye West';
+var search = 'radiohead';
 var maxTracks = 10;
-
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Loading the page
 
 // (1) When everything is loaded, then--
-window.onload = function() {
+window.onload = function () {
     // (1) Grab the tracks from Spotify's search results
     tracks = SPSearch('track', search).tracks;
 
@@ -43,8 +42,10 @@ window.onload = function() {
     for (var j = 0; j < sortArrows.length; j++) {
         sortArrows[j].addEventListener('click', sortByMe, false);
     }
-};
 
+    // stop loading gif
+    stopLoading();
+};
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -66,49 +67,7 @@ function trackDiv(track) {
 
     rowBackground(row); // (1) and add a background to the row
 
-    row = nullify(row); // (2) and add null to the necessary cells in the row
-
     return row;
-}
-
-
-function nullify(row) {
-    // (2) A function to actually assign the null class to null cells in a row
-
-    // Identify the null cells
-    var cellsToNull = nullCells(row);
-    
-    // A function we use to modify a nodeList
-    function addNull(cell) { cell.classList.add('null'); }
-
-    for (var key in cellsToNull) {
-        if (cellsToNull[key]) {
-            var cellNodes = row.getElementsByClassName(key.replace(/^data-/, ''));
-            var cells = Array.prototype.slice.call(cellNodes);
-            cells.map(addNull);
-        }
-    }
-
-    return row;
-}
-
-
-function nullCells(trackDiv) {
-    // (2) We're using this function to label some cells null so that CSS
-    // styling (e.g. for the bpm and s units) isn't applied to null fields
-
-    var nullTests = {
-        // A dictionary of functions we'll use to test if the cell is null
-        'data-tempo': function (tempo) { return isNaN(tempo) || tempo < 0; },
-        'data-length': function (length) { return isNaN(length) || length < 0; }
-    };
-
-    for (var key in nullTests) {
-        // re-define nullTests with whether that attribute is null
-        nullTests[key] = trackDiv.hasAttribute(key) ? nullTests[key](trackDiv.getAttribute(key)) : null;
-    }
-
-    return nullTests;
 }
 
 
@@ -128,7 +87,8 @@ function rowAttrsFromTrack(track) {
         // more about it at:
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator
         'data-tempo': track.echo ? track.echo.audio_summary.tempo : -1,
-        'data-length': track.echo ? track.echo.audio_summary.duration : -1
+        'data-duration': track.echo ? track.echo.audio_summary.duration : -1
+
     };
 
     return attrs;
@@ -170,24 +130,23 @@ function placeRow(trackDiv) {
 }
 
 
-
 //////////////////////////////////////////////////////////////////////////////
 // Generating individual cells
 
 function cellsFromTrackAndAttrs(track, attrs) {
     var cells = [ // A list of pairs containing the 1) class we want in a cell,
         // and 2) the content we want in the cell
-        ['spotify-embed', SPIframe(track, 'compact')],
+        ['spotify-embed', SPIframe(track)],
         ['artist', attrs['data-artist']],
         ['title', attrs['data-title']],
         ['tempo', attrs['data-tempo'] > 0 ? // if we have a number
             Math.round(attrs['data-tempo']) : // round it
             '-'
         ], // otherwise, display it as '-'
-        ['length', attrs['data-length'] > 0 ? // if we have a number
-            Math.round(attrs['data-length']) : // round it
-            '-'
-        ] // otherwise, display it as '-'
+        ['duration', attrs['data-duration'] > 0 ?
+            (parseInt(Math.round(attrs['data-duration']) / 60) + ' : '
+                + parseInt(Math.round(attrs['data-duration']) % 60)) : '-'
+        ]
     ];
 
     // (1) Iterate over those cells & wrap that content in an appropriate Node
@@ -202,11 +161,10 @@ function cellsFromTrackAndAttrs(track, attrs) {
     // (2) a list of just each item's _2nd_ element (the wrapped content)
     // You can read more about map at:
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
-    return cells.map(function(c) {
+    return cells.map(function (c) {
         return c[1];
     });
 }
-
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -230,7 +188,17 @@ function setCurrentTrack(track) {
     trackDiv.classList.add('current-track');
 
     // (1) Set the cover album art to the URL grabbed from Spotify metadata
-    document.getElementById('cover').style.backgroundImage = 'url(' + coverURL(track) + ')';
+    //document.getElementById('cover').style.backgroundImage = 'url(' + coverURL(track) + ')';
+    document.getElementById('cover').style.backgroundColor = '#FFFFFF';
+
+    // plotting pitches
+    var trackCanvas = document.getElementById("canId");
+    track.canvas = trackCanvas;
+    plotPitches(track);
+
+    // Display lyrics of the songs by musixmatch api
+    var lyrics = MMSearch(track);
+    document.getElementById('lyrics').innerHTML = (lyrics === null || lyrics === 'undefined') ? 'No Lyrics...' : lyrics;
 
     // (1) Modify the displayed artist and track name
     document.getElementById('track-artist').innerHTML = artists(track);
@@ -249,8 +217,7 @@ function setCurrentTrack(track) {
 function inter() {
     // (1) This function generates a simple div we'll use as an overlay to
     // intercept events
-
-    var interstitial = document.createElement('div');
+    var interstitial = document.createElement('img');
     interstitial.setAttribute('class', 'inter');
     interstitial.addEventListener('click', setInters);
 
@@ -262,18 +229,30 @@ function setInters(e) {
     // (1) Every time an .inter is clicked, we want to change the currentTrack
     // reset the other .inters, and hide the one just clicked.
 
+    // start loading gif
+    startLoading();
+
     var href = e.toElement.parentNode.getAttribute('data-contained-track');
     var track = trackByHref(href);
     setCurrentTrack(track);
 
+    // hide spotify logo using cover album
+    hideSpotifyLogo();
+    e.toElement.style.display = 'none';
+
+    // stop loading gif
+    stopLoading();
+}
+
+function hideSpotifyLogo(){
     var inters = document.getElementsByClassName('inter');
     for (var i = 0; i < inters.length; i++) {
         inters[i].style.display = 'initial';
+        inters[i].setAttribute('src', coverURL(tracks[i]));
+        inters[i].style.width = '80px';
+        inters[i].style.height = '80px';
     }
-    e.toElement.style.display = 'none';
 }
-
-
 
 //////////////////////////////////////////////////////////////////////////////
 // Sorting the tracklist by various headings
@@ -284,9 +263,14 @@ function sortByMe(e) {
     var arrow = e.toElement; // Which element received this event?
     var heading = arrow.id.split('-')[1]; // Find out which heading is ours
 
-    var direction = arrow.classList.contains('up') ? 'ascending': 'descending';
+    var ascending = null;
+    if (arrow.classList.contains('up')) {
+        ascending = 'ascending';
+    } else {
+        ascending = 'descending';
+    }
 
-    sortTableBy(tracklist, sortBy(heading, direction));
+    sortTableBy(tracklist, sortBy(heading, ascending));
 }
 
 
@@ -297,8 +281,8 @@ function sortTableBy(table, sortingFunction) {
     // current order, we need to sort by their playlist-position when we grab
     // them
     var toSort = Array.prototype.slice.call(
-        table.getElementsByClassName('track row')).sort(
-        sortBy('playlist-position', 'ascending'));
+            table.getElementsByClassName('track row')).sort(
+            sortBy('playlist-position', 'ascending'));
 
     toSort.sort(sortingFunction); // Note that sort can take an argument used
     // used to determine order
@@ -353,7 +337,6 @@ function sortBy(whichClass, direction) {
 }
 
 
-
 //////////////////////////////////////////////////////////////////////////////
 // Spotify & EchoNest data collection
 
@@ -375,7 +358,6 @@ function analyse(track) {
 
 // The remainder of the Spotify and EchoNest functionality is in spotify.js
 // and echonest.js, respectively.
-
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -476,10 +458,10 @@ function scalePoints(points, xRangeMax, yRangeMax) {
 
 
     // Grabbing our x- and y- points separately
-    var x = points.map(function(e) {
+    var x = points.map(function (e) {
         return e[0];
     });
-    var y = points.map(function(e) {
+    var y = points.map(function (e) {
         return e[1];
     });
 
@@ -492,10 +474,10 @@ function scalePoints(points, xRangeMax, yRangeMax) {
     var yRatio = yRange / yRangeMax;
 
     // Actually shrinking our x's and y's
-    var newX = x.map(function(e) {
+    var newX = x.map(function (e) {
         return e / xRatio;
     });
-    var newY = y.map(function(e) {
+    var newY = y.map(function (e) {
         return e / yRatio;
     });
 
@@ -507,3 +489,16 @@ function scalePoints(points, xRangeMax, yRangeMax) {
 
     return scaled;
 }
+
+function startLoading(){
+    // add loading class for html tag
+    document.getElementsByTagName( "html" )[0].classList.add( "loading" );
+}
+function stopLoading(){
+    setTimeout(function(){
+        // remove loading class by html tag
+        document.getElementsByTagName( "html" )[0].classList.remove( "loading" );
+    }, 3000);
+}
+
+
