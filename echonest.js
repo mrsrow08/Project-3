@@ -1,4 +1,4 @@
-//////////////////////////////////////
+///////////////////////////////////////
 // EchoNest functionality
 
 // (1) Spotify's API is open to anyone, for EchoNest's you need to sign up for 
