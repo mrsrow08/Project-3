@@ -30,6 +30,24 @@ function ENSearch(track) {
     return null;
 }
 
+function ENSongMMId(track){
+
+    var artistQuery = artists(track, ' ');
+    var titleQuery = track.name;
+
+    var ENResults = ENSongSearch({
+        'artist': artistQuery,
+        'title': titleQuery,
+        'bucket': 'id:musixmatch-WW',
+        'limit': 'true'
+    });
+    if (ENResults[0]) {
+        return ENResults[0];
+    }
+    // else
+    return null;
+}
+
 
 function ENSongSearch(parameters) {
     // (1) This function searches _just_ EchoNest's song API and returns the 
@@ -102,7 +120,6 @@ function ENSongMetadata(ENid, bucket) {
 }
 
 
-
 ////////////////////////////////////////
 // Sketching loudness from EchoNest data
 
@@ -144,8 +161,8 @@ function loudnessSketch(track) {
         var loud = []; // (2) an array to hold loudnesses
         var points = []; // (2) an array to hold the points we'll plot
 
-        P.setup = function() {
-            P.size(tracklist.offsetWidth, 80);
+        P.setup = function () {
+            P.size(640, 80);
             if (track.echo) {
                 for (var i = 0; i < numPoints; i++) {
                     loud[i] = loudnessAt(track, dt * i);
@@ -171,7 +188,7 @@ function loudnessSketch(track) {
             }
         };
 
-        P.draw = function() {
+        P.draw = function () {
             // (2) Since we're not animating, we don't need anything in draw
         };
     }
@@ -207,4 +224,72 @@ function rowBackground(row) {
     row.style.backgroundImage = "url(" + binaryImageData + ")";
 
     return binaryImageData;
+}
+
+function pitchSketch(track) {
+
+    function sketchProc(P) {
+
+        var pitches = []; // (2) an array to hold pitches
+        var points = []; // (2) an array to hold the points we'll plot
+
+        P.setup = function () {
+            P.size(200, 200);
+
+            if (track.echo) {
+
+                var segments = track.echo.audio_analysis.segments;
+                var next = 0;
+                for (var i = 0; i < segments.length; i++) {
+
+                    pitches = segments[i].pitches;
+                    //alert(pitches) ;
+
+                    for (var j = 0; j < 12; j++) {
+                        points[next + j] = [next + j, pitches[j]];
+                    }
+                    next += 12;
+                }
+
+
+                // (2) Scale our points down to fill up our width and height
+                points = scalePoints(points, P.width, P.height);
+
+
+                // (1) Draw our points in a slightly transparent blue
+                P.background(255);
+                //P.fill(0, 121, 184);
+                P.noFill();
+                P.stroke(0, 121, 184);
+                P.beginShape();
+                for (var j = 0; j < points.length; j++) {
+                    var x = points[j][0];
+                    var y = P.height + points[j][1] - 100;
+                    P.curveVertex(x, y);
+                }
+                P.endShape();
+
+            } else {
+
+                P.background(255);
+
+            }
+        };
+
+        P.draw = function () {
+            // (2) Since we're not animating, we don't need anything in draw
+
+        };
+
+    }
+
+    return sketchProc;
+
+}
+function plotPitches(track) {
+    // (1) In this function we actually attach the Processing sketch to our canvas
+
+    var P = new Processing(track.canvas, pitchSketch(track));
+
+    return P;
 }
