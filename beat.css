@@ -3,21 +3,36 @@
 html, body {
 	padding: 0;
 	margin: 0;
-
-	height: 100%;
+    width: 100%;
+    min-height: 100%;
 }
 
-html { background-color: #EEE; }
+html {
+    background-color: #EEE;
+    -webkit-transition: background-color 1s;
+    transition: background-color 1s;
+}
+html.loading {
+    /* Replace #333 with the background-color of your choice */
+    /* Replace loading.gif with the loading image of your choice */
+    background: #EEE url('./data/loading.gif') no-repeat 50% 50%;
+    opacity:1;
+    filter:alpha(opacity=100);
 
+}
+html.loading body{
+    opacity: 0.4;
+    filter:alpha(opacity=40);
+}
 body {
 	position: absolute;
-	
 	top: 0;
 	bottom: 0;
-	width: 800px;
-	left: calc( (100% - 800px) / 2 );
+	width: 640px;
+	left: calc( (100% - 640px) / 2 );
 
 	overflow: hidden;
+
 }
 
 #container {
@@ -26,6 +41,7 @@ body {
 	top: 0;
 	bottom: 0;
 	width: 100%;
+
 }
 
 
@@ -40,7 +56,7 @@ body {
 	position: absolute;
 	top: -240px;
 
-	width: 800px;
+	width: 640px;
 	height: 240px;
 
 	background-color: #ccc
@@ -93,24 +109,50 @@ body {
 	height: 100%;
 
 	font-family: 'Codystar', serif;
-	font-size: 2em;
+	font-size: 1em;
 	text-transform: uppercase;
 }
 
 #track-data-container > div {
-	position: absolute;
-
-	width: calc(800px - 240px);
-	height: 25%;
 	line-height: 2em;
-	
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
+    margin-top: 15px;
 }
 
-#track-artist { top: 2em; }
-#track-name { bottom: 2em; }
+#track-artist {
+
+    width: 45%;
+    float: left;
+    height: 15%;
+    text-align: center;
+    white-space: nowrap; /* We don't want any multiline cells */
+    overflow: hidden;
+    text-overflow: ellipsis; /* This replaces too-long text with '...' */
+}
+#track-name {
+    width: 45%;
+    float: left;
+    height: 15%;
+    text-align: center;
+    padding-left: 10px;
+    white-space: nowrap; /* We don't want any multiline cells */
+    overflow: hidden;
+    text-overflow: ellipsis; /* This replaces too-long text with '...' */
+}
+#separator{
+    width: 4%;
+    float: left;
+    text-align: center;
+}
+#lyrics{
+    font-size: 11px;
+    font-family: 'Open Sans', sans-serif;
+    text-transform: lowercase;
+    float: left;
+    height: 65%;
+    width: 95%;
+    overflow: hidden;
+
+}
 
 
 /*****************************************************************************
@@ -121,7 +163,7 @@ body {
 	top: 0;
 	bottom: 0;
 
-	width: 800px;
+	width: 640px;
 }
 
 #tracklist {
@@ -223,15 +265,10 @@ body {
 sixths, deciding that .tempo should be one half .artist and one-third title */
 .album  { width: calc( 5em + 1em); }
 .artist { width: calc( (100% - (5em + 1em)) * 2/7); }
-.title  { width: calc( (100% - (5em + 1em)) * 3/7); }
+.title  { width: calc( (100% - (5em + 1em)) * 2/7); }
 .tempo  { width: calc( (100% - (5em + 1em)) * 1/7); }
-.length { width: calc( (100% - (5em + 1em)) * 1/7); }
+.duration  { width: calc( (100% - (5em + 1em)) * 2/7); }
 
-.cell:after { font-size: 0.5em; }
-.cell.null:after { content: ''; }
-
-.tempo:after { content: 'bpm'; }
-.length:after { content: 's'; }
 
 /**************************************
 * Track row styling */
@@ -240,7 +277,7 @@ sixths, deciding that .tempo should be one half .artist and one-third title */
 	margin-left: 9px;
 	margin-right: 9px;
 
-	width: calc(800px - 2*9px);
+	width: calc(640px - 2*9px);
 }
 
 .track {
@@ -340,3 +377,5 @@ a.sort {
 	width: 80px;
 	height: 80px;
 }
+
+
